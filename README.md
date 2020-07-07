@@ -12,4 +12,4 @@
 
 | 名称EN | 描述 | 说明 |  
 |---|---|---| 
-| [PingShutdown](./PingShutdown) | 在UPS无联动NAS检测断电关机的情景下，<br>以另一种同目的方式执行自动关机保护NAS | 未整理0% |  
+| [PingShutdown](./PingShutdown) | 在UPS无联动NAS检测断电关机的情景下，<br>以另一种同目的方式执行自动关机保护NAS | [食用]((./PingShutdown)) |  
