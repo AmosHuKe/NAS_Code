@@ -2,7 +2,8 @@
 
 <br>  
 
-> 💾 NAS：Synology DS218+（以及各种支持Shell脚本的设备）  
+> 💾 NAS：Synology DS218+（各种支持Shell脚本的设备）  
+> 🔋 UPS：克雷士(KLS) S1000  
 > 🖖 方式：任务计划处理  
 > 🎁 目的：方便后期整理使用（也许，嗯......）  
   
