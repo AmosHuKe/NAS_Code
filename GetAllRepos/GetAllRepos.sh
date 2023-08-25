@@ -22,7 +22,8 @@
 # ------ END 配置 ------
 
 # ------ BEGIN 获取所有 repo 链接 ------
-echo "------ BEGIN 获取所有 repo 链接 ------"
+echo "------------------------"
+echo "BEGIN 获取所有 repo 链接"
 
   # 创建临时文件夹并进入
   mkdir -p $directoryTemp
@@ -39,7 +40,8 @@ echo "------ BEGIN 获取所有 repo 链接 ------"
   # 循环每页
   while [ -n "$repo" ]
   do
-    echo "------ BEGIN 正在获取第 $page 页 repo ------"
+    echo "------------------------"
+    echo "- BEGIN 正在获取第 $page 页 repo"
 
     repo=""
 
@@ -63,19 +65,22 @@ echo "------ BEGIN 获取所有 repo 链接 ------"
       let page++
     fi
 
-    echo "------ END 正在获取第 $page 页 repo ------"
+    echo "- END 正在获取第 $page 页 repo"
+    echo "------------------------"
     echo ""
   done
 
   # 写入文件
   echo -e "$repos" > $gitCloneUrl
 
-echo "------ END 获取所有 repo 链接 ------"
+echo "END 获取所有 repo 链接"
+echo "------------------------"
 echo ""
 # ------ END 获取所有 repo 链接 ------
 
-# ------ BEGIN 操作 Git clone ------
-echo "------ BEGIN 操作 Git clone ------"
+# ------ BEGIN 操作 git clone ------
+echo "------------------------"
+echo "BEGIN 操作 git clone"
 
   # 创建 repo 文件夹并进入
   cd ..
@@ -87,28 +92,36 @@ echo "------ BEGIN 操作 Git clone ------"
   do
     if [ -n "$repoLine" ]
     then
-      echo "------ BEGIN 操作 Git clone $repoLine ------"
+      echo "------------------------"
+      echo "BEGIN 操作 git clone $repoLine"
 
       git clone $repoLine
 
-      echo "------ END 操作 Git clone $repoLine ------"
+      echo "END 操作 git clone $repoLine"
+      echo "------------------------"
       echo ""
     fi
   done < "../$directoryTemp/$gitCloneUrl"
 
-echo "------ END 操作 Git clone ------"
+echo "END 操作 git clone"
+echo "------------------------"
 echo ""
-# ------ END 操作 Git clone ------
+# ------ END 操作 git clone ------
 
-# ------ BEGIN 遍历所有 Repo 并同步拉取 ------
-echo "------ BEGIN 遍历所有 Repo 并同步拉取 ------"
+# ------ BEGIN 遍历所有 repo 并同步拉取 ------
+echo "------------------------"
+echo "BEGIN 遍历所有 repo 并同步拉取"
+
+# 删除 repo 文件夹的记录
+removeRepoFilesLog=""
 
 repoFiles=`ls -d */`
 for repoFile in $repoFiles
 do
   repofilename=`basename $repoFile`
 
-  echo "------ BEGIN 同步拉取 $repofilename ------"
+  echo "------------------------"
+  echo "- BEGIN 同步拉取 $repofilename"
   
   cd $repofilename
 
@@ -116,19 +129,34 @@ do
   thisRepoFiles=`ls`
   if [ -z "$thisRepoFiles" ]
   then
-    echo "删除 $repofilename"
+    echo "- 删除 $repofilename"
+    removeRepoFilesLog+="$repofilename\r\n"
     cd ..
     rm -rf $repofilename
   else
-    echo "拉取 $repofilename"
+    echo "- 拉取 $repofilename"
     git pull
     cd ..
   fi
 
-  echo "------ END 同步拉取 $repofilename ------"
+  echo "- END 同步拉取 $repofilename"
+  echo "------------------------"
   echo ""
 done
 
-echo "------ END 遍历所有 Repo 并同步拉取 ------"
+echo "END 遍历所有 repo 并同步拉取"
+echo "------------------------"
 echo ""
-# ------ END 遍历所有 Repo 并同步拉取 ------
+# ------ END 遍历所有 repo 并同步拉取 ------
+
+# ------ BEGIN 总结 ------
+echo "------------------------"
+echo "BEGIN 总结"
+
+  echo "- BEGIN 删除 repo 文件夹的记录"
+  echo -e "$removeRepoFilesLog"
+  echo "- END 删除 repo 文件夹的记录"
+
+echo "END 总结"
+echo "------------------------"
+# ------ END 总结 ------
