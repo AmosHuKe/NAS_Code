@@ -49,14 +49,14 @@ echo "------ BEGIN 获取所有 repo 链接 ------"
       -H "Accept: application/vnd.github+json" \
       -H "Authorization: Bearer $accesstoken" \
       -H "X-GitHub-Api-Version: 2022-11-28" \
-      "https://api.github.com/user/repos?per_page=50&page=$page&sort=updated" \
+      "https://api.github.com/user/repos?per_page=50&page=$page" \
       | grep -w "clone_url" \
     )
 
     if [ -n "$repo" ]
     then
       # 清理链接
-      repo=$(echo "$repo" | grep -P -o "https://github.com/(.)*.git")
+      repo=$(echo "$repo" | grep -E -o "https://github.com/(.)*.git")
       repo=$(echo "$repo" | awk '{gsub(/^\s+|\s+$/, "");print}')
 
       repos+="$repo\r\n"
@@ -103,7 +103,7 @@ echo ""
 # ------ BEGIN 遍历所有 Repo 并同步拉取 ------
 echo "------ BEGIN 遍历所有 Repo 并同步拉取 ------"
 
-repoFiles=`ls`
+repoFiles=`ls -d */`
 for repoFile in $repoFiles
 do
   repofilename=`basename $repoFile`
@@ -116,9 +116,11 @@ do
   thisRepoFiles=`ls`
   if [ -z "$thisRepoFiles" ]
   then
+    echo "删除 $repofilename"
     cd ..
     rm -rf $repofilename
   else
+    echo "拉取 $repofilename"
     git pull
     cd ..
   fi
