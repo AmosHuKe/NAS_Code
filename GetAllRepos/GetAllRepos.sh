@@ -56,7 +56,7 @@ echo "------ BEGIN 获取所有 repo 链接 ------"
     if [ -n "$repo" ]
     then
       # 清理链接
-      repo=$(echo "$repo" | grep -P -o "(?P<host>(git@|https://)([\w\.@]+)(/|:))(?P<owner>[\w,\-,\_]+)/(?P<repo>[\w,\-,\_]+)(.git){0,1}((/){0,1})")
+      repo=$(echo "$repo" | grep -P -o "https://github.com/(.)*.git")
       repo=$(echo "$repo" | awk '{gsub(/^\s+|\s+$/, "");print}')
 
       repos+="$repo\r\n"
