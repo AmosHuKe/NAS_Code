@@ -102,6 +102,9 @@ echo "BEGIN 操作 git"
       repoLineUser=$(echo "$repoLine" | grep -P -o "(?<=https://github.com/).*(?=.git)")
       echo "文件夹：$repoLineUser"
 
+      # 创建文件夹
+      mkdir -p $repoLineUser
+
       # 克隆 clone
       echo "- 克隆 clone"
       git clone $repoLine $repoLineUser
