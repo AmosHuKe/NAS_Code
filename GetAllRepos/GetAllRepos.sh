@@ -58,7 +58,7 @@ echo "BEGIN 获取所有 repo 链接"
     if [ -n "$repo" ]
     then
       # 清理链接
-      repo=$(echo "$repo" | grep -E -o "https://github.com/(.)*.git")
+      repo=$(echo "$repo" | grep -P -o "https://github.com/(.)*.git")
       repo=$(echo "$repo" | awk '{gsub(/^\s+|\s+$/, "");print}')
 
       repos+="$repo\r\n"
@@ -78,9 +78,12 @@ echo "------------------------"
 echo ""
 # ------ END 获取所有 repo 链接 ------
 
-# ------ BEGIN 操作 git clone ------
+# ------ BEGIN 操作 git ------
 echo "------------------------"
-echo "BEGIN 操作 git clone"
+echo "BEGIN 操作 git"
+
+  # 删除 repo 文件夹的记录
+  removeRepoFilesLog=""
 
   # 创建 repo 文件夹并进入
   cd ..
@@ -93,65 +96,43 @@ echo "BEGIN 操作 git clone"
     if [ -n "$repoLine" ]
     then
       echo "------------------------"
-      echo "BEGIN 操作 git clone $repoLine"
+      echo "BEGIN 操作 $repoLine"
 
-      # 截取 User 作为文件夹
+      # 截取 user 作为文件夹
       repoLineUser=$(echo "$repoLine" | grep -P -o "(?<=https://github.com/).*(?=.git)")
       echo "文件夹：$repoLineUser"
-      # Clone
+
+      # 克隆 clone
+      echo "- 克隆 clone"
       git clone $repoLine $repoLineUser
 
-      echo "END 操作 git clone $repoLine"
+      # 拉取 pull
+      echo "- 拉取 pull"
+      cd $repoLineUser
+      git pull
+
+      # 回到起始位置
+      cd ../..
+
+      # 判断是否空文件夹，需要删除文件夹。
+      thisRepoFiles=`ls $repoLineUser`
+      if [ -z "$thisRepoFiles" ]
+      then
+        echo "- 删除 $repoLineUser"
+        removeRepoFilesLog+="$repoLineUser\r\n"
+        rm -rf $repoLineUser
+      fi
+
+      echo "END 操作 $repoLine"
       echo "------------------------"
       echo ""
     fi
   done < "../$directoryTemp/$gitCloneUrl"
 
-echo "END 操作 git clone"
+echo "END 操作 git"
 echo "------------------------"
 echo ""
-# ------ END 操作 git clone ------
-
-# ------ BEGIN 遍历所有 repo 并同步拉取 ------
-echo "------------------------"
-echo "BEGIN 遍历所有 repo 并同步拉取"
-
-# 删除 repo 文件夹的记录
-removeRepoFilesLog=""
-
-repoFiles=`ls -d */`
-for repoFile in $repoFiles
-do
-  repofilename=`basename $repoFile`
-
-  echo "------------------------"
-  echo "- BEGIN 同步拉取 $repofilename"
-  
-  cd $repofilename
-
-  # 判断是否空文件夹，代表 clone 未完成，需要删除文件夹。
-  thisRepoFiles=`ls`
-  if [ -z "$thisRepoFiles" ]
-  then
-    echo "- 删除 $repofilename"
-    removeRepoFilesLog+="$repofilename\r\n"
-    cd ..
-    rm -rf $repofilename
-  else
-    echo "- 拉取 $repofilename"
-    git pull
-    cd ..
-  fi
-
-  echo "- END 同步拉取 $repofilename"
-  echo "------------------------"
-  echo ""
-done
-
-echo "END 遍历所有 repo 并同步拉取"
-echo "------------------------"
-echo ""
-# ------ END 遍历所有 repo 并同步拉取 ------
+# ------ END 操作 git ------
 
 # ------ BEGIN 总结 ------
 echo "------------------------"
@@ -164,3 +145,5 @@ echo "BEGIN 总结"
 echo "END 总结"
 echo "------------------------"
 # ------ END 总结 ------
+
+read -n 1 -s -r -p "Press any key to continue"
