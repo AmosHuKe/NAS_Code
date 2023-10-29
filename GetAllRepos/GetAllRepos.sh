@@ -95,7 +95,11 @@ echo "BEGIN 操作 git clone"
       echo "------------------------"
       echo "BEGIN 操作 git clone $repoLine"
 
-      git clone $repoLine
+      # 截取 User 作为文件夹
+      repoLineUser=$(echo "$repoLine" | grep -P -o "(?<=https://github.com/).*(?=.git)")
+      echo "文件夹：$repoLineUser"
+      # Clone
+      git clone $repoLine $repoLineUser
 
       echo "END 操作 git clone $repoLine"
       echo "------------------------"
