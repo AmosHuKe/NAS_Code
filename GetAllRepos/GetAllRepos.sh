@@ -10,6 +10,11 @@
   # 比如：获取所有 repo（包括私有），需要勾选上 Repository permissions -> Contents 可读
   accesstoken=""
 
+  # 组织
+  # 空：不获取
+  # 需要获取多个组织以逗号,分割，如 aa,bb,cc
+  orgs=""
+
   # repo 文件夹
   directoryRepo="github"
 
@@ -37,11 +42,11 @@ echo "BEGIN 获取所有 repo 链接"
   repos="" # 总数据
   page=1 # 页数
 
-  # 循环每页
+  # 循环每页 - 个人
   while [ -n "$repo" ]
   do
     echo "------------------------"
-    echo "- BEGIN 正在获取第 $page 页 repo"
+    echo "- BEGIN 正在获取【个人】第 $page 页 repo"
 
     repo=""
 
@@ -65,9 +70,50 @@ echo "BEGIN 获取所有 repo 链接"
       let page++
     fi
 
-    echo "- END 正在获取第 $page 页 repo"
+    echo "- END 正在获取【个人】第 $page 页 repo"
     echo "------------------------"
     echo ""
+  done
+
+  # 组织列表
+  orgList=$(echo $orgs | tr "," "\n")
+  for org in $orgList
+  do
+    # 重置分页
+    repo="-"
+    page=1
+
+    # 循环每页 - 组织
+    while [ -n "$repo" ]
+    do
+      echo "------------------------"
+      echo "- BEGIN 正在获取【组织 - $org】第 $page 页 repo"
+
+      repo=""
+
+      # 获取 clone_url
+      repo=$( \
+        curl -L \
+        -H "Accept: application/vnd.github+json" \
+        -H "X-GitHub-Api-Version: 2022-11-28" \
+        "https://api.github.com/orgs/$org/repos?per_page=50&page=$page" \
+        | grep -w "clone_url" \
+      )
+
+      if [ -n "$repo" ]
+      then
+        # 清理链接
+        repo=$(echo "$repo" | grep -P -o "https://github.com/(.)*.git")
+        repo=$(echo "$repo" | awk '{gsub(/^\s+|\s+$/, "");print}')
+
+        repos+="$repo\r\n"
+        let page++
+      fi
+
+      echo "- END 正在获取【组织 - $org】第 $page 页 repo"
+      echo "------------------------"
+      echo ""
+    done
   done
 
   # 写入文件
